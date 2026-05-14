@@ -1,0 +1,640 @@
+<!doctype html>
+<html lang="pl">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
+    <title>FleetManager</title>
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <script type="module" src="js/main.js" defer></script>
+    <script src="https://kit.fontawesome.com/1017934682.js" crossorigin="anonymous"></script>
+    <link rel="stylesheet" href="dashboard.css" />
+    <link rel="icon" type="image/png" href="/image/logo.png" />
+  </head>
+
+  <body>
+    <div id="alert"></div>
+    <div id="menuBar">
+      <div class="icon-box">
+        <div class="icon-content">
+          <img src="/image/logo.png" alt="logo" />
+          <div class="name-box">
+            <h2>FleetManager</h2>
+            <p>Zarządzanie flotą</p>
+          </div>
+        </div>
+        <button id="menuCloseBtn" class="menuCloseBtn">
+          <i class="fa-solid fa-xmark"></i>
+        </button>
+      </div>
+      <ul class="viewsMenu">
+        <li
+          onclick="goToDashboard()"
+          class="viewButton menuButton always-visible active"
+          data-view="viewDashboard"
+          data-title="Pulpit"
+        >
+          <i class="fa-solid fa-bars-staggered"></i>
+          <p>Pulpit</p>
+        </li>
+        <li class="viewButton menuButton" data-view="viewPojazdy" data-title="Pojazdy">
+          <i class="fa-solid fa-truck"></i>
+          <p>Pojazdy</p>
+        </li>
+        <li class="viewButton menuButton" data-view="viewKierowcy" data-title="Kierowcy">
+          <i class="fa-solid fa-users"></i>
+          <p>Kierowcy</p>
+        </li>
+        <li class="viewButton menuButton" data-view="viewDokumenty" data-title="Dokumenty">
+          <i class="fa-solid fa-file-circle-check"></i>
+          <p>Dokumenty</p>
+        </li>
+        <li class="viewButton menuButton" data-view="viewUżytkownicy" data-title="Użytkownicy">
+          <i class="fa-solid fa-users-gear"></i>
+          <p>Użytkownicy</p>
+        </li>
+        <li
+          class="viewButton menuButton"
+          data-view="viewUstawieniaFirmy"
+          data-title="Ustawienia firmy"
+        >
+          <i class="fa-solid fa-city"></i>
+          <p>Ustawienia firmy</p>
+        </li>
+        <li class="viewButton menuButton" data-view="viewMojePojazdy" data-title="Moje pojazdy">
+          <i class="fa-solid fa-truck"></i>
+          <p>Moje pojazdy</p>
+        </li>
+
+        <li class="viewButton menuButton" data-view="viewMojeDokumenty" data-title="Moje dokumenty">
+          <i class="fa-solid fa-file"></i>
+          <p>Moje dokumenty</p>
+        </li>
+        <li
+          class="viewButton menuButton always-visible"
+          data-view="viewUstawieniaProfilu"
+          data-title="Ustawienia profilu"
+        >
+          <i class="fa-solid fa-user"></i>
+          <p>Ustawienia profilu</p>
+        </li>
+      </ul>
+      <div class="logoutButton">
+        <div id="logoutBtn">
+          <i class="fa-solid fa-arrow-right-from-bracket"></i>
+          <p>Wyloguj</p>
+        </div>
+      </div>
+    </div>
+    <div class="view">
+      <div class="topBar">
+        <div class="topBarLeft">
+          <div id="menuBarOpen" class="menuButton">
+            <i class="fa-solid fa-bars"></i>
+          </div>
+          <h2 id="viewTitle">Pulpit</h2>
+        </div>
+        <div class="userInfo">
+          <i class="fa-solid fa-user"></i>
+          <p id="userInfo-userMail"></p>
+        </div>
+      </div>
+      <div id="viewCreateFirma" class="inView">
+        <div class="main">
+          <div class="create-company-container">
+            <div class="create-company-box">
+              <h2>Dodaj firmę</h2>
+              <p>Aby korzystać z wszystkich funkcji FleetManager, dodaj swoją firmę.</p>
+
+              <div
+                class="add-company-btn"
+                id="addCompanyBtn"
+                data-view="viewCreateFirmaForm"
+                data-title="Dodaj firmę"
+              >
+                <i class="fa-solid fa-plus"></i>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div id="viewCreateFirmaForm" class="inView">
+        <div class="main">
+          <h2>Dodaj swoją firmę</h2>
+          <div class="createFirmaForm createForm">
+            <h3>Dane firmy</h3>
+            <p>Nazwa firmy</p>
+            <input type="text" id="firmaNazwa" />
+            <p>Email firmy</p>
+            <input type="email" id="firmaAdres" />
+            <div class="createFormButtons">
+              <button class="acceptButton" onclick="createFirmaFromForm()">Akceptuj</button>
+              <button class="cancelButton" onclick="cancelCreateFirmaFromForm()">Anuluj</button>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div id="viewDashboard" class="inView">
+        <div class="main">
+          <h3>Podsumowanie statusu dokumentów</h3>
+          <div class="dokumentyTiles">
+            <div class="wazneTile tile">
+              <div class="info">
+                <p>Dokumenty ważne</p>
+                <p id="wazneNumber" class="number"></p>
+              </div>
+              <div class="tileIcon">
+                <i class="fa-solid fa-file-circle-check"></i>
+              </div>
+            </div>
+            <div class="wygasajaTile tile">
+              <div class="info">
+                <p>Wygasają wkrótce</p>
+                <p id="wygasajaNumber" class="number"></p>
+              </div>
+              <div class="tileIcon">
+                <i class="fa-solid fa-triangle-exclamation"></i>
+              </div>
+            </div>
+            <div class="niewazneTile tile">
+              <div class="info">
+                <p>Nieważne</p>
+                <p id="nieWazneNumber" class="number"></p>
+              </div>
+              <div class="tileIcon">
+                <i class="fa-solid fa-circle-xmark"></i>
+              </div>
+            </div>
+          </div>
+          <div class="nadchodzaceTerminy">
+            <h3>Nadchodzące terminy</h3>
+            <div class="tiles" id="nadchodzaceTiles"></div>
+          </div>
+          <h3 id="szybkieAkcjeTitle">Szybkie akcje</h3>
+          <div class="szybkieAkcje" id="szybkieAkcje">
+            <div class="tile" data-view="viewDodajPojazd" data-title="Dodaj pojazd">
+              <div class="tileIcon">
+                <i class="fa-solid fa-plus"></i>
+              </div>
+              <h3>Dodaj pojazd</h3>
+              <p>Zarejestruj nowy pojazd we flocie</p>
+            </div>
+            <div class="tile" data-view="viewDodajKierowcę" data-title="Dodaj kierowcę">
+              <div class="tileIcon">
+                <i class="fa-solid fa-plus"></i>
+              </div>
+              <h3>Dodaj kierowcę</h3>
+              <p>Dodaj nowego kierowcę do zespołu</p>
+            </div>
+            <div class="tile" data-view="viewDodajDokument" data-title="Dodaj dokument">
+              <div class="tileIcon">
+                <i class="fa-solid fa-plus"></i>
+              </div>
+              <h3>Dodaj dokument</h3>
+              <p>Dodaj dokument do systemu</p>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div id="viewPojazdy" class="inView">
+        <div class="main">
+          <div class="pojazdy">
+            <div class="titleButton">
+              <h3>Lista pojazdów</h3>
+              <button data-view="viewDodajPojazd" class="addButton" data-title="Dodaj pojazd">
+                Dodaj pojazd
+              </button>
+            </div>
+            <div class="table table-header">
+              <div>TYP POJAZDU</div>
+              <div>NUMER REJESTRACYJNY</div>
+              <div>MARKA I MODEL</div>
+              <div>PRZYPISANY KIEROWCA</div>
+              <div>AKCJE</div>
+            </div>
+
+            <div id="pojazdyRows"></div>
+          </div>
+        </div>
+      </div>
+      <div id="viewDodajPojazd" class="inView dodajNowy">
+        <div class="main">
+          <div class="header">
+            <button data-view="viewPojazdy" data-title="Pojazdy">
+              <i class="fa-solid fa-arrow-left"></i>
+            </button>
+            <p>Dodaj nowy pojazd</p>
+          </div>
+          <div class="createPojazdForm createForm">
+            <h3>Dane pojazdu</h3>
+            <p>Typ pojazdu</p>
+            <select id="selectTypPojazdu">
+              <option value="Ciężarówka">Ciężarówka</option>
+              <option value="Naczepa">Naczepa</option>
+            </select>
+            <p>Numer rejestracyjny</p>
+            <input type="text" id="pojazdNumerRejestracyjny" />
+            <div class="createFormGrid">
+              <div class="halfScreenInput">
+                <p>Marka</p>
+                <input type="text" id="pojazdMarka" maxlength="30" />
+              </div>
+              <div class="halfScreenInput">
+                <p>Model</p>
+                <input type="text" id="pojazdModel" maxlength="30" />
+              </div>
+              <div class="halfScreenInput">
+                <p>Rok produkcji</p>
+                <input type="number" id="pojazdRokProdukcji" min="1900" />
+              </div>
+              <div class="halfScreenInput">
+                <p>Numer VIN</p>
+                <input type="text" id="pojazdNumerVIN" maxlength="17" />
+              </div>
+            </div>
+            <p>Przypisany kierowca (opcjonalnie)</p>
+            <select aria-placeholder="Brak przypisania" id="PojazdPrzypisanyKierowca"></select>
+            <div class="createFormButtons">
+              <button class="acceptButton" onclick="dodajPojazdFromForm()">Dodaj pojazd</button>
+              <button class="cancelButton" onclick="cancelCreatePojazdFromForm()">Anuluj</button>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div id="viewKierowcy" class="inView">
+        <div class="main">
+          <div class="pojazdy">
+            <div class="titleButton">
+              <h3>Lista kierowców</h3>
+              <button data-view="viewDodajKierowcę" class="addButton" data-title="Dodaj kierowcę">
+                Dodaj kierowcę
+              </button>
+            </div>
+            <div class="table table-header">
+              <div>IMIĘ I NAZWISKO</div>
+              <div>TELEFON</div>
+              <div>E-MAIL</div>
+              <div>AKCJE</div>
+            </div>
+
+            <div id="kierowcyRows"></div>
+          </div>
+        </div>
+      </div>
+
+      <div id="viewDodajKierowcę" class="inView dodajNowy">
+        <div class="main">
+          <div class="header">
+            <button data-view="viewKierowcy" data-title="Kierowcy">
+              <i class="fa-solid fa-arrow-left"></i>
+            </button>
+            <p>Dodaj nowego kierowcę</p>
+          </div>
+          <div class="createPojazdForm createForm">
+            <h3>Dane kierowcy</h3>
+            <div class="createFormGrid">
+              <div class="halfScreenInput">
+                <p>Imię</p>
+                <input type="text" id="kierowcaImie" maxlength="30" />
+              </div>
+              <div class="halfScreenInput">
+                <p>Nazwisko</p>
+                <input type="text" id="kierowcaNazwisko" maxlength="30" />
+              </div>
+            </div>
+            <p>Telefon</p>
+            <input
+              type="tel"
+              id="kierowcaTelefon"
+              value="+48 "
+              pattern="^\+[0-9]{2}\s[0-9]{9}$"
+              maxlength="15"
+              required
+              placeholder="+48"
+              autocomplete="off"
+            />
+            <p>E-mail</p>
+            <input type="email" id="kierowcaMail" maxlength="50" />
+            <div class="createFormButtons">
+              <button class="acceptButton" onclick="dodajKierowcęFromForm()">Dodaj kierowcę</button>
+              <button class="cancelButton" onclick="cancelCreateKierowcęFromForm()">Anuluj</button>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div id="viewDokumenty" class="inView">
+        <div class="main">
+          <div class="filtry">
+            <h3>Filtry</h3>
+            <p>Status</p>
+            <div class="buttons">
+              <button class="active">Wszystkie</button>
+              <button>Ważne</button>
+              <button>Wygasające</button>
+              <button>Nieważne</button>
+            </div>
+            <p>Typ przypisania</p>
+            <div class="buttons">
+              <button class="active">Wszystkie</button>
+              <button>Pojazdy</button>
+              <button>Kierowcy</button>
+              <button>Firma</button>
+            </div>
+          </div>
+          <div class="pojazdy">
+            <div class="titleButton">
+              <h3>Lista dokumentów <span class="dokumentyCount">(1)</span></h3>
+              <button data-view="viewDodajDokument" class="addButton" data-title="Dodaj dokument">
+                Dodaj dokument
+              </button>
+            </div>
+            <div class="table table-header">
+              <div>NAZWA DOKUMENTU</div>
+              <div>PRZYPISANIE</div>
+              <div>DATA WAŻNOŚCI</div>
+              <div>STATUS</div>
+              <div>AKCJE</div>
+            </div>
+
+            <div id="dokumentyRows"></div>
+          </div>
+        </div>
+      </div>
+
+      <div id="viewDodajDokument" class="inView dodajNowy">
+        <div class="main">
+          <div class="header">
+            <button data-view="viewDokumenty" data-title="Dokumenty">
+              <i class="fa-solid fa-arrow-left"></i>
+            </button>
+            <p>Dodaj nowy dokument</p>
+          </div>
+          <div class="createDokumentForm createForm">
+            <h3>Dane dokumentu</h3>
+            <p>Nazwa dokumentu</p>
+            <input type="text" id="dokumentNazwa" maxlength="50" />
+            <p>Data ważności</p>
+            <input type="date" id="dokumentDataWaznosci" placeholder="dd.mm.rrrr" />
+            <p>Typ przypisania</p>
+            <select id="dokumentTypPrzypisania">
+              <option value="Firma">Firma</option>
+              <option value="Pojazd">Pojazd</option>
+              <option value="Kierowca">Kierowca</option>
+            </select>
+            <div id="dokumentWlascicielWrapper" style="display: none">
+              <p id="dokumentWlascicielText">Wybierz właściciela</p>
+              <select id="dokumentWlascicielId"></select>
+            </div>
+
+            <div class="file-upload" id="fileUpload">
+              <input type="file" id="fileInput" accept=".pdf,.jpg,.png" hidden />
+              <div class="upload-box">
+                <i class="fa-solid fa-arrow-up-from-bracket"></i>
+                <p>Kliknij, aby wybrać plik lub przeciągnij go tutaj</p>
+                <span>PDF, JPG, PNG (maksymalnie 10MB)</span>
+              </div>
+            </div>
+
+            <div class="createFormButtons">
+              <button class="acceptButton" onclick="dodajDokumentFromForm()">Dodaj dokument</button>
+              <button class="cancelButton" onclick="cancelCreateDokumentFromForm()">Anuluj</button>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div id="viewUżytkownicy" class="inView">
+        <div class="main">
+          <div class="pojazdy">
+            <div class="titleButton">
+              <h3>Lista użytkowników</h3>
+              <button
+                data-view="viewDodajUzytkownika"
+                data-title="Dodaj użytkownika"
+                class="addButton"
+              >
+                Dodaj użytkownika
+              </button>
+            </div>
+            <div class="table table-header">
+              <div>E-MAIL</div>
+              <div>ROLA</div>
+              <div>STATUS</div>
+              <div>AKCJE</div>
+            </div>
+
+            <div id="użytkownicyRows"></div>
+          </div>
+          <div class="pojazdy">
+            <h3 class="roleWSys">Role w systemie</h3>
+            <p class="role"><span>Właściciel:</span>Pełny dostęp do wszystkich funkcji</p>
+            <p class="role">
+              <span>Administrator:</span>Zarządzanie flotą, kierowcami i dokumentami
+            </p>
+            <p class="role">
+              <span>Kierowca:</span>Dostęp do swoich dokumentów i przypisanego pojazdu
+            </p>
+            <p class="role"><span>Przeglądający:</span>Tylko odczyt danych</p>
+          </div>
+        </div>
+      </div>
+
+      <div id="viewDodajUzytkownika" class="inView dodajNowy">
+        <div class="main">
+          <div class="header">
+            <button data-view="viewUżytkownicy" data-title="Użytkownicy">
+              <i class="fa-solid fa-arrow-left"></i>
+            </button>
+            <p>Dodaj nowego użytkownika</p>
+          </div>
+          <div class="createPojazdForm createForm">
+            <h3>Dane użytkownika</h3>
+            <p>Rola w systemie</p>
+            <select id="selectTypUżytkownika">
+              <option value="Przeglądający">Przeglądający</option>
+              <option value="Właściciel">Właściciel</option>
+              <option value="Kierowca">Kierowca</option>
+              <option value="Administrator">Administrator</option>
+            </select>
+            <div id="kierowcaSelectWrapper" style="display: none">
+              <p>Powiązany kierowca</p>
+              <select id="selectKierowca">
+                <option value="">Wybierz kierowcę</option>
+              </select>
+            </div>
+            <div id="emailWrapper">
+              <p>Email</p>
+              <input type="email" id="użytkownikMail" />
+            </div>
+
+            <div class="createFormGrid" id="kierowcaDane">
+              <div class="halfScreenInput">
+                <div id="imieWrapper" style="display: none">
+                  <p>Imię</p>
+                  <input type="text" id="użytkownikImie" readonly />
+                </div>
+              </div>
+              <div class="halfScreenInput">
+                <div id="nazwiskoWrapper" style="display: none">
+                  <p>Nazwisko</p>
+                  <input type="text" id="użytkownikNazwisko" readonly />
+                </div>
+              </div>
+            </div>
+            <p>Tymczasowe hasło</p>
+            <input type="password" id="użytkownikHaslo" />
+            <div class="info">
+              <span>Uwaga:</span>Użytkownik powinien zmienić hasło po zalogowaniu się na swoje
+              konto.
+            </div>
+            <div class="createFormButtons">
+              <button class="acceptButton" onclick="dodajUżytkownikaFromForm()">
+                Dodaj użytkownika
+              </button>
+              <button class="cancelButton" onclick="cancelCreateUżytkownikaFromForm()">
+                Anuluj
+              </button>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div id="viewUstawieniaFirmy" class="inView">
+        <div class="main">
+          <div class="createPojazdForm createForm">
+            <h3>Dane firmy</h3>
+            <p>Nazwa firmy</p>
+            <input type="text" id="firmaDaneNazwa" />
+            <p>E-mail firmy</p>
+            <input type="email" id="firmaMail" />
+            <p>Adres</p>
+            <input
+              type="text"
+              id="firmaDaneAdres"
+              placeholder="ul. Transportowa 123, 00-001 Warszawa"
+            />
+            <div class="createFormGrid">
+              <div class="halfScreenInput">
+                <p>NIP</p>
+                <input type="text" id="firmaNIP" maxlength="10" />
+              </div>
+              <div class="halfScreenInput">
+                <p>REGON</p>
+                <input type="text" id="firmaREGON" maxlength="9" />
+              </div>
+            </div>
+            <p>Numer licencji transportowej</p>
+            <input type="text" id="firmaNumerLicencji" />
+            <div class="createFormButtons">
+              <button class="acceptButton acceptZmianyButton" onclick="acceptZmianyFirmy()">
+                Zapisz zmiany
+              </button>
+              <button class="cancelButton" onclick="cancelZmianyFirmy()">Anuluj</button>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div id="viewUstawieniaProfilu" class="inView">
+        <div class="main">
+          <div class="createPojazdForm createForm">
+            <h3>Dane osobowe</h3>
+            <div class="createFormGrid">
+              <div class="halfScreenInput">
+                <p>Imię</p>
+                <input type="text" id="userImie" />
+              </div>
+              <div class="halfScreenInput">
+                <p>Nazwisko</p>
+                <input type="text" id="userNazwisko" />
+              </div>
+            </div>
+            <p>Numer telefonu</p>
+            <input
+              type="tel"
+              id="userTelefon"
+              value="+48 "
+              pattern="^\+[0-9]{2}\s[0-9]{9}$"
+              placeholder="+48"
+              maxlength="15"
+              required
+              autocomplete="off"
+            />
+            <div class="createFormButtons">
+              <button class="acceptButton acceptZmianyButton" onclick="acceptZmianyUser()">
+                Zapisz zmiany
+              </button>
+              <button class="cancelButton" onclick="cancelZmianyUser()">Anuluj</button>
+            </div>
+          </div>
+          <div class="createPojazdForm createForm">
+            <h3>Zmiana hasła</h3>
+            <p>Obecne hasło</p>
+            <input type="password" id="userHaslo" />
+            <p>Nowe hasło</p>
+            <input type="password" id="userNoweHaslo" />
+            <p>Powtórz nowe hasło</p>
+            <input type="password" id="userNoweHasloPowtorz" />
+            <div class="createFormButtons">
+              <button class="acceptButton acceptZmianyButton" onclick="acceptZmianyHasla()">
+                Zmień hasło
+              </button>
+              <button class="cancelButton" onclick="cancelZmianyUser()">Anuluj</button>
+            </div>
+          </div>
+        </div>
+      </div>
+    <div id="viewMojePojazdy" class="inView">
+      <div class="main">
+        <div class="pojazdy">
+          <div class="titleButton">
+            <h3>Moje pojazdy</h3>
+          </div>
+
+          <div class="table table-header">
+            <div>NUMER REJESTRACYJNY</div>
+            <div>MARKA</div>
+            <div>MODEL</div>
+            <div>AKCJE</div>
+          </div>
+
+          <div id="mojePojazdyRows"></div>
+        </div>
+      </div>
+    </div>
+
+    <div id="viewMojeDokumenty" class="inView">
+      <div class="main">
+        <div class="pojazdy">
+          <div class="titleButton">
+            <h3>Moje dokumenty</h3>
+          </div>
+
+          <div class="table table-header">
+            <div>NAZWA DOKUMENTU</div>
+            <div>WŁAŚCICIEL</div>
+            <div>WYGASA</div>
+            <div>STATUS</div>
+            <div>AKCJE</div>
+          </div>
+
+          <div id="mojeDokumentyRows"></div>
+        </div>
+      </div>
+    </div>
+
+    <div id="detailsModal" class="modal">
+      <div class="modal-content">
+        <span class="modal-close">&times;</span>
+        <div id="modalBody"></div>
+      </div>
+    </div>
+
+    <div id="globalLoader" class="loader hidden">
+      <div class="spinner"></div>
+      <p>Ładowanie...</p>
+    </div>
+  </body>
+</html>

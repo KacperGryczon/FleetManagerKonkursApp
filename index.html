@@ -1,0 +1,38 @@
+<!doctype html>
+<html lang="pl">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
+
+    <title>FleetManager</title>
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <script type="module" src="login.js" defer></script>
+    <link rel="stylesheet" href="style.css" />
+    <script src="https://kit.fontawesome.com/1017934682.js" crossorigin="anonymous"></script>
+    <link rel="icon" type="image/png" href="/image/logo.png" />
+  </head>
+
+  <body class="login">
+    <div class="icon-box">
+      <img src="/image/logo.png" alt="logo" />
+    </div>
+    <h2>FleetManager</h2>
+    <p>Zaloguj się do systemu zarządzania flotą</p>
+
+    <p id="login_error"></p>
+    <div class="login-box">
+      <p class="input-label">E-mail</p>
+      <input id="loginEmail" />
+
+      <p class="input-label">Hasło</p>
+      <input id="loginPassword" type="password" />
+
+      <button onclick="login()">Zaloguj się</button>
+
+      <div class="login-register">
+        <p>Nie masz konta?</p>
+        <a href="register.html">Zarejestruj się</a>
+      </div>
+    </div>
+  </body>
+</html>
