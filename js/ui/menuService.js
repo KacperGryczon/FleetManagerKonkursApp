@@ -118,7 +118,6 @@ export function initMenuToggle() {
     menuButton.addEventListener("click", () => {
       menuBar.classList.toggle("open");
       menuOverlay.classList.toggle("active");
-      console.log("siema");
     });
   }
 

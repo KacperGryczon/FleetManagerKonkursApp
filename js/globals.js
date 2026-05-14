@@ -39,8 +39,6 @@ window.cancelCreateFirmaFromForm = async function () {
 window.dodajPojazdFromForm = async function () {
   const firmaId = await getCompanyIdForUser();
 
-  console.log("dodajPojazdFromForm: firmaId =", firmaId);
-
   if (!firmaId) {
     showAlert(false, "Nie znaleziono firmy. Nie masz przypisanej firmy lub brakuje dostępu.");
     return;
@@ -61,8 +59,6 @@ window.dodajPojazdFromForm = async function () {
     showAlert(false, "Wybierz typ pojazdu");
     return;
   }
-
-  console.log("dodajPojazdFromForm: Wysyłanie danych:", vehicleData, "dla firmy:", firmaId);
 
   if (await handleAddVehicle(vehicleData, firmaId)) {
     showView("viewPojazdy", "Pojazdy");

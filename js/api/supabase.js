@@ -3,8 +3,6 @@ const { createClient } = supabase;
 const supabaseUrl = "https://ljgaynalrpmhqagqucdb.supabase.co";
 const supabaseKey = "sb_publishable_fI4hiqkxxSqxFp0gx9E7OA_GCKQPwPt";
 
-console.log(supabaseKey);
-
 if (!supabaseUrl || !supabaseKey) {
   console.error("❌ Environment variables not loaded! aaaa");
   console.error("Make sure:");

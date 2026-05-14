@@ -83,7 +83,6 @@ export async function getCompanyIdForUser() {
   }
 
   if (companyFromUser?.id) {
-    console.log("getCompanyIdForUser: Znaleziono firmę po user_id:", companyFromUser.id);
     cachedCompanyId = companyFromUser.id;
     companyIdExpiresAt = now + CACHE_DURATION;
     return companyFromUser.id;
@@ -110,7 +109,6 @@ export async function getCompanyIdForUser() {
     return null;
   }
 
-  console.log("getCompanyIdForUser: Znaleziono firmę z UZYTKOWNIK:", firmaId);
   cachedCompanyId = firmaId;
   companyIdExpiresAt = now + CACHE_DURATION;
   return firmaId;
