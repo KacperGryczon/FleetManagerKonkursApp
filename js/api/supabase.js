@@ -1,7 +1,7 @@
 const { createClient } = supabase;
 
-const supabaseUrl = import.meta.env.VITE_SUPABASE_URL;
-const supabaseKey = import.meta.env.VITE_SUPABASE_ANON_KEY;
+const supabaseUrl = "https://ljgaynalrpmhqagqucdb.supabase.co";
+const supabaseKey = "sb_publishable_fI4hiqkxxSqxFp0gx9E7OA_GCKQPwPt";
 
 if (!supabaseUrl || !supabaseKey) {
   console.error("❌ Environment variables not loaded!");
